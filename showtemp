@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+#
+# Get temperatures from sensors utility and reformat the output
+# (this was written as an aid to writing waitcool)
+
+sub gettemp {
+my @a;
+@a = split "\n", `sensors | grep Core`;
+my $M = 0.0;
+my $m = 200.0;
+my @t = ();
+my ($b,$c);
+for $b (@a) {
+        $b =~ /^Core \d+:\s+\+(\d+\.\d+)°C.*$/;
+        $c = 0+$1;
+        push @t, $c;
+        $M = $c if $c > $M;
+        $m = $c if $c < $m;
+}
+my $r = [$m,$M,\@t];
+return $r;        
+}
+if( scalar @ARGV > 0 ) {
+        $w = 0+$ARGV[0];
+} else {
+        $w = 10;
+}
+print "Temps:\n";
+while( 1 ) {
+        my $r = &gettemp;
+        my ($m,$M,$t) = @{$r};
+        my $mm = sprintf("%4.1f",$m);
+        my $MM = sprintf("%4.1f",$M);
+        my @t = @{$t};
+        my @u = ();
+        my $u;
+        for $u (@t) {
+                push @u, sprintf("%4.1f",$u);
+        }
+        my $tt = join " ", @u;
+        my $aa = "[$mm,$MM] $tt\n";
+        print $aa;
+        sleep $w;
+}

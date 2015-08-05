@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+import zargs,sys
+
+args = sys.argv[1:]
+if "-l" in args:
+    i = args.index("-l")
+    # is next arg an integer? else make l = 1
+    del(args[i])
+    t = args[i]
+    print("L: {}".format(t))
+    try:
+        l = int(t)
+        del(args[i])
+    except (ValueError,IndexError):
+        # in either case, -l is not followed by a number
+        l = 1
+else:
+    l = None
+if "--after" in args:
+    i = args.index("--after")
+    before = args[:i]
+    after = args[i+1:]
+else:
+    before = args
+    after = []
+
+z = zargs.Zargs()
+z.makecmd(before,after)
+print("Task is: {}".format(z.mytask(["ARGS..."])))
+print("Args per exec: {}".format(l))
+z.go(l)

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+# The reason for this is an issue with sudo:
+# If I want to do, say
+#   sudo echo hello > /etc/myfile
+# this will fail due to a permission error.
+# The reason is that the > /etc/myfile is done in the containing shell
+# which is a normal user, not root -- the echo is done as root, but the
+# redirect is not -- the exact opposite of what we want.
+# dog lets is type
+#   echo hello | sudo dog /etc/myfile
+
+# Writes from stdin into each named file
+tee "$@" >& /dev/null

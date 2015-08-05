@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+# File search/replace
+# filesr hello world sayhello boohello flibble myhello
+# will try to rename sayhello to sayworld, boohello to booworld,
+# and myhello to myworld, ignoring flibble.
+# This contains a hack to deal with case insensitive but retentive
+# filesystems, using a temp file
+# This allows, e.g. changing 
+#   file001 file002
+# to 
+#   File001 File002
+# on a NTFS or FAT32 formatted usb drive
+
+import sys,os
+
+args = sys.argv[1:]
+
+if len(args) < 3:
+    print("filesr searchpat replpat <files>")
+    sys.exit(1)
+
+s,r = tuple(args[:2])
+files = args[2:]
+print(42,s,r)
+
+import uuid,os.path
+while True:
+    t = str(uuid.uuid4())
+    if not os.path.exists(t):
+        break
+print("Temp name {}".format(t)) # only relevent with case retentive fs
+
+for x in files:
+    y = x.replace(s,r)
+    if x == y:
+        pass
+    elif os.path.exists(y):
+        print("{} already exists".format(y))
+    else:
+        xa = x.lower()
+        ya = y.lower()
+        if xa == ya:
+            print("Capitalisation issue")
+            print("Using temp name {}".format(t))
+            print(x,y)
+            os.rename(x,t)
+            os.rename(t,y)
+        else:
+            print("Just rename")
+            print(x,y)
+            os.rename(x,y)
+

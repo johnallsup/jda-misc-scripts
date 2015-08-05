@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+# After cat and dog, we have hamster, or ham for short
+# cat takes a list of files, concatenates them and writes them
+# to stdout
+# dog takes stdin and writes it to each of the listed files
+# (basically it does tee and pipes the output to /dev/null)
+
+[ -z "$CMD" ] && CMD=cat
+while read s; do
+    "$CMD" $s
+done

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+# Play raw 48k pcm float32 data
+play -t raw -r 48k -b 32 -e float "$1"

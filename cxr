@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+# I've typed this command so often I decided it's worth a shorthand
+chmod -R a+rx "$@"

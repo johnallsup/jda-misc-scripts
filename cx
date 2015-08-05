@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+# Another shorthand for the chronically lazy user
+chmod a+rx "$@"

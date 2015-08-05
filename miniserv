@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+# Launch a new instance of minidlnad
+# Useful for sharing a single directory
+
+usage = """miniserv name=NAME port=PORT mediadir=/path/to/media
+defaults:
+    name: minidlna-USER-PORT
+    port: 8200 (must be different for each instance)
+    mediadir: current directory
+"""
+
+
+import os,os.path,sys,subprocess
+from distutils.dir_util import mkpath,DistutilsFileError
+import distutils
+
+import socket
+def getIp():
+    a = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    a.connect(('192.168.2.1',0))
+    return a.getsockname()[0]
+
+def getopt(args):
+    d = {}
+    for s in args:
+        if '=' in s:
+            i = s.index('=')
+            a = s[:i]
+            b = s[i+1:]
+            d[a]=b
+            print("{}: {}".format(a,b))
+    return d        
+
+#log_level=general,artwork,database,inotify,scanner,metadata,http,ssdp,tivo=warn
+def conf(**kw):
+    myip = getIp()
+    ipa = int(myip.split('.')[3])
+    defs = {'user':os.getenv('USER'),'mediadir':os.getcwd(),'port':8200,'loglevel':'general','myip':ipa}
+    defs.update(kw)
+    defs['port'] = int(defs['port'])
+    if not 'name' in defs: defs['name']="minidlna-{user}-{port}".format(**defs)
+    if not 'var' in defs: defs['var']="/tmp/minidlna.{user}/port-{port}".format(**defs)
+    var=defs['var']
+    try:
+        mkpath(var)
+        mkpath(os.path.join(var,"db"))
+        mkpath(os.path.join(var,"log"))
+    except distutils.errors.DistutilsFileError:
+        print("Failed to create {}".format(var))
+        raise
+    confn = os.path.join(var,"minidlna.conf")
+    conf = '''
+user={user}
+media_dir={mediadir}
+db_dir={var}/db
+log_dir={var}/log
+log_level={loglevel}
+root_container=B
+#network_interface=
+#listening_ip=
+port={port}
+#presentation_url=/
+friendly_name={name}
+serial=68101981059{port}
+uuid={myip:04d}-{port:04d}
+#model_name=Windows Media Connect compatible (MiniDLNA)
+#model_number=
+#inotify=yes
+album_art_names=Cover.jpg/cover.jpg/AlbumArtSmall.jpg/albumartsmall.jpg
+album_art_names=AlbumArt.jpg/albumart.jpg/Album.jpg/album.jpg
+album_art_names=Folder.jpg/folder.jpg/Thumb.jpg/thumb.jpg
+#strict_dlna=no
+#enable_tivo=no
+#notify_interval=895
+minissdpdsocket={var}/minissdpd.sock
+'''.format(**defs)
+    with open(confn,"wt") as f:
+        print('Config in {}'.format(confn))
+        f.write(conf)
+    return confn    
+
+if "--help" in sys.argv or "-h" in sys.argv:
+    print(usage)
+else:
+    subprocess.call(['minidlnad','-f',conf(**getopt(sys.argv[1:]))])
+

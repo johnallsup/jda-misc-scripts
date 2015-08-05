@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+# Executes each line of a script, and aborts if there is an error.
+# This is mainly designed for when copying and pasting install
+# scripts (using sudo apt-get) from t'internet.
+
+A=()
+if [ -f "$1" ]; then
+	while read s; do
+        A=("${A[@]}" "$s")
+    done
+fi < "$1"
+for s in "${A[@]}"; do
+    eval $s || break
+done

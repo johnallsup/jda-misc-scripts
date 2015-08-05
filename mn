@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+# Script to automate mounting many NTFS formatted harddrives/USB sticks
+
+# Set U variable to set other UID
+# Usage:
+#   mn e a # means sudo mount -o uid=$U /dev/sde1 a
+#   mn e3 mpoint # means sudo mount -o uid=$U /dev/sde3 mpoint
+#   mn cdrom mpx # means sudo mount -o uid=$U /dev/cdrom mpx
+# arguments are taken in pairs
+if [ -z "$*" ]; then
+    echo "Sudo mount for NTFS mounts"
+fi
+if [ -z "$U" ]; then
+    U=$(id -u $USER)
+fi
+echo User $U
+((UX=U))
+idn() {
+    local A="$1"
+    local B=$((A))
+    getent passwd "$B" | head -n1 | cut -f1 -d:
+}
+echo "Mounting as uid $UX ($(idn $UX))"
+declare -a A=() B=()
+while [ -n "$*" ]; do
+        echo "Args: '$*'"
+    if [ -z "$2" ]; then
+        echo "Trailing '$2'"
+        break
+    else
+        A=("${A[@]}" "$1")
+        B=("${B[@]}" "$2")
+        shift
+        shift
+    fi
+done
+echo "A: ${A[@]}"
+echo "B: ${B[@]}"
+for s in "${!A[@]}"; do
+    U="${#A[$s]}"
+    V="${A[$s]}"
+    T="${B[$s]}"
+    if [ "$U" = 1 ]; then
+        S="/dev/sd${V}1"
+        echo "${V} -> $S"
+    elif [ "$U" = 2 ]; then        
+        S="/dev/sd${V}"
+        echo "${V} -> $S"
+    elif [ "$(basename "$V")" = "$V" ]; then
+        S="/dev/${V}"
+        echo "${V} -> $S"
+    else
+        S="$V"
+        echo "$V as is"
+    fi
+    sudo mount -o uid=$UX "$S" "$T"
+done

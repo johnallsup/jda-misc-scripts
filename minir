@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+# Script to relaunch minidlnad with existing conf file
+# miniserv writes conf files somewhere in /tmp
+
+A="$1"
+if [ -n "$A" ]; then
+    if [ -d "$A" -a -f "$A/minidlna.conf" ]; then
+        minidlnad -f "$A/minidlna.conf"
+    elif [ -f "$A" ]; then
+        minidlnad -f "$A"
+    else
+        echo "'$A' needs to be a file, or directory containing minidlna.conf"
+    fi
+else
+    if [ -f "minidlna.conf" ]; then
+        minidlnad -f minidlna.conf
+    else
+        echo "no minidlna.conf here"
+    fi
+fi

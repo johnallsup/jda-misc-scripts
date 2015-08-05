@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+#
+# Plot a .wav file
+
+import matplotlib.pyplot as plt
+import numpy as np
+import wave
+import sys
+
+args = sys.argv[1:]
+if len(args) == 0:
+    print("No files!")
+    sys.exit(1)
+
+for x in args:
+    spf = wave.open(x,'r')
+
+    #Extract Raw Audio from Wav File
+    signal = spf.readframes(-1)
+    signal = np.fromstring(signal, 'Int16')
+
+    #If Stereo
+    if spf.getnchannels() == 2:
+        print('Just mono files')
+        sys.exit(0)
+
+    mx0 = 32768
+    mn0 = -32768
+    mn = 32768
+    mx = -32768
+    r = signal.shape[0]
+    for i in range(r):
+        if mn > signal[i]:
+            mn = signal[i]
+        if mx < signal[i]:
+            mx = signal[i]
+    print("Min,max = {} {}".format(mn,mx))
+    if mx < mx0:
+        mx =mx0 
+    if mn > mn0:
+        mn = mn0
+    plt.figure(1)
+    plt.title('Waveform {}'.format(x))
+    plt.plot(signal)
+    if mx > mx0:
+        plt.plot([0,signal.shape[0]],[mx0,mx0],color='red',linestyle='-',
+                linewidth=1)
+    if mn < mn0:
+        plt.plot([0,signal.shape[0]],[mn0,mn0],color='red',linestyle='-',
+                linewidth=1)
+    plt.ylim([mn,mx])
+    plt.show()

@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+# Uses head and tail to extract lines
+# Interesting bash scripting example
+# For reference
+#import sys
+#print("".join(sys.stdin.readlines()[from,to]))
+# is a python3 one-liner which does basically the same thing.
+
+
+unset A B C D
+A="$1"
+B="$2"
+if [ ! "$A" == "$((A))" ]; then
+    echo First parameter must be integer, second optional is number of lines
+else
+    shift
+fi
+if [ "$B" == "$((B))" ]; then
+    C=$B
+    shift
+else
+    C=1
+fi
+if ((A<0)); then
+    ((D=-A))
+    if [ -n "$*" ]; then
+        cat "$@"
+    else
+        cat -
+    fi | tail -n $D | head -n $C
+else
+    D=$((A+C))
+    if [ -n "$*" ]; then
+        cat "$@"
+    else
+        cat -
+    fi | head -n $D | tail -n $C
+fi

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+# Make stuff mine (do not recurse directories)
+
+sudo chown --reference="$HOME" "$@"

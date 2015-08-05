@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+# Convert float32 raw PCM data to 16bit wav
+# Currently just does 48k sample rate
+
+A="$1"
+B="${A%%.rawpcm}.wav"
+sox -t raw -r 48k -b 32 -e float "$A" -t wav -b 16 -e signed "$B"

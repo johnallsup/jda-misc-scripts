@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+# Copyright John Allsup 2015
+# Released under the GNU General Public License v3
+# See file LICENSE
+
+# Wait for all core temps to be below a given temperature in degrees C
+# then exit
+# If you want a quiet version, or one which takes a -q flag to make quiet,
+# either comment the print lines, or modify the script.
+#
+sub gettemp {
+my @a;
+@a = split "\n", `sensors | grep Core`;
+my $m = 0.0;
+my ($b,$c);
+for $b (@a) {
+        $b =~ /^Core \d+:\s+\+(\d+\.\d+)°C.*$/;
+        $c = 0+$1;
+        $m = $c if $c > $m;
+}
+return $m;        
+}
+if( scalar @ARGV > 0 ) {
+        $n = 0+$ARGV[0];
+} else {
+        $n = 30;
+}
+if( scalar @ARGV > 1 ) {
+        $w = 0+$ARGV[1];
+        $w = 1 if $w < 1;
+} else {
+        $w = 1;
+}
+print "Waiting for max temp to be below $n, wait period $w\n";
+while( ($d = &gettemp) >= $n ) {
+        sleep $w;
+        print ".";
+}
+print "Temperature is now $d, exiting.\n";
